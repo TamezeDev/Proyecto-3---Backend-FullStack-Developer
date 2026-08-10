@@ -1,0 +1,32 @@
+{
+  "name": "proyecto-3---backend-fullstack-developer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TamezeDev/Proyecto-3---Backend-FullStack-Developer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TamezeDev/Proyecto-3---Backend-FullStack-Developer/issues"
+  },
+  "homepage": "https://github.com/TamezeDev/Proyecto-3---Backend-FullStack-Developer#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "eslint": "^10.8.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.9.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
