@@ -7,7 +7,7 @@ class AppError extends Error {
 }
 
 class InsertError extends AppError {
-  constructor(message = 'Insert data error') {
+  constructor(message = 'Error insertando datos en la base de datos') {
     super(message, 422)
   }
 }
@@ -19,19 +19,19 @@ class ValidationError extends AppError {
 }
 
 class AuthError extends AppError {
-  constructor(message = "You don't have enough permission") {
+  constructor(message = 'No autorizado para hacer esta operación') {
     super(message, 401)
   }
 }
 
 class ForbiddenError extends AppError {
-  constructor(message = 'Your access has been denied') {
+  constructor(message = 'Acceso no permitido') {
     super(message, 403)
   }
 }
 
 class NotFoundError extends AppError {
-  constructor(message = 'Resource not found') {
+  constructor(message = 'No se ha encontrado') {
     super(message, 404)
   }
 }

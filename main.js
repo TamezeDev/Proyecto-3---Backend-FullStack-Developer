@@ -7,7 +7,7 @@ const PORT = process.env.BACKEND_PORT
 // Listener
 const initListener = () =>
   app.listen(PORT, () => {
-    console.log(`✅ SERVER STARTED AT ADDRESS: http://localhost:${PORT}`)
+    console.log(`✅ Servidor iniciado en: http://localhost:${PORT}`)
   })
 
 initBackend()
