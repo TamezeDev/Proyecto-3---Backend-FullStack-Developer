@@ -1,7 +1,7 @@
 import mongoose from 'mongoose'
 import bcrypt from 'bcrypt'
 
-const Schema = mongoose.Schema()
+const Schema = mongoose.Schema
 
 const userSchema = new Schema(
   {
@@ -22,10 +22,11 @@ const userSchema = new Schema(
       trim: true,
       required: true,
       match: [
-        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?_-#&]+$/,
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?_#&-]+$/,
         'La contraseña debe contener mayusculas, minusculas y algún caracter especial',
       ],
       minlength: [8, 'La contraseña debe tener al menos 8 caracteres'],
+      select: false,
     },
     birthDate: {
       type: Date,
