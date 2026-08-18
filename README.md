@@ -115,6 +115,7 @@ body
 
 - Se requiere de headers con el token de sesión para identificar el usuario en la base de datos. 
 - Solo un usuario con rol *admin* puede hacer uso de este endpoint
+
 ### 5. Modificar o poner una imagen de perfil al usuario
 
 Envío mediante `PUT` a:
@@ -133,3 +134,25 @@ FormData
 - Se requiere de headers con el token de sesión para identificar el usuario en la base de datos. 
 - Si el usuario tiene foto anteriormente la elimina del servidor para ahorro de espacio
 
+## Tarjetas de pago
+
+### 1. Añadir una tarjeta a la lista del usuario
+
+Envío mediante `POST` a:
+
+```text
+baseUrl/api/v1/cards/create
+```
+
+```javascript
+body
+{
+  "nameOwner": "Usuario para pruebas",
+  "numberCard": "1234567812345678",
+  "expiredDate": "12/30",
+  "cvv": "123"
+}
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos. 
+- Se validará los datos recibidos, como fecha de caducidad, formatos, ...

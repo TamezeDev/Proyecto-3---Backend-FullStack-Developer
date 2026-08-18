@@ -24,3 +24,9 @@ export const bodyValidToChangePass = (body) => {
   if (!body.currentPass || !body.newPass || !body.repeatNewPass) return false
   else return true
 }
+
+export const bodyValidToRegisterCard = (body) => {
+  if (!body.nameOwner || !body.numberCard || !body.expiredDate || !body.cvv)
+    return false
+  else return true
+}

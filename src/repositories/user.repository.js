@@ -176,8 +176,6 @@ const modifyProfileImg = async (req, res, next) => {
       )
 
     const oldImageId = user.imageProfileId
-    /*    user.imageProfileUrl = image.path
-    user.imageProfileId = image.filename */
 
     const updated = await User.findByIdAndUpdate(
       req.body.userId,
@@ -187,7 +185,6 @@ const modifyProfileImg = async (req, res, next) => {
         runValidators: true,
       }
     )
-    /*     updated.password = undefined */
 
     if (oldImageId) deleteImgCloudinary(oldImageId)
 
@@ -203,4 +200,47 @@ const modifyProfileImg = async (req, res, next) => {
   }
 }
 
-export { createUser, login, modifyPassword, getUsers, modifyProfileImg }
+// Add new card payment
+const addUserCard = async (userId, cardId, next) => {
+  if (!cardId)
+    return next(
+      new ValidationError(
+        'Es necesario adjuntar los datos de la tarjeta guardados'
+      )
+    )
+
+  const user = await User.findById(userId)
+  if (!user)
+    return next(new NotFoundError('El usuario no se encuentra en el servidor'))
+
+  const cardslist = user.cardPayments
+  const hadUserCard = cardslist.includes(cardId.toString())
+  if (hadUserCard)
+    return next(
+      new ValidationError('La tarjeta ya está registrada en su lista')
+    )
+
+  cardslist.push(cardId)
+
+  const updated = await User.findByIdAndUpdate(
+    userId,
+    { cardPayments: cardslist },
+    {
+      returnDocument: 'after',
+      runValidators: true,
+    }
+  )
+  if (!updated)
+    return next(
+      new InsertError('Error guardando la tarjeta en la lista del usuario')
+    )
+}
+
+export {
+  createUser,
+  login,
+  modifyPassword,
+  getUsers,
+  modifyProfileImg,
+  addUserCard,
+}
