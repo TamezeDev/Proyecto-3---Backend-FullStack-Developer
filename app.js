@@ -10,7 +10,7 @@ const app = express()
 
 const initBackend = async () => {
   // Conecction
-  connect()
+  await connect()
   app.use(express.json())
   // Endpoints
   app.use('/api/v1/users', userRoutes)

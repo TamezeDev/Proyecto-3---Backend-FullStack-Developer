@@ -14,3 +14,8 @@ export const bodyValidToRegisterUser = (body) => {
     return false
   else return true
 }
+
+export const bodyValidToLogin = (body) => {
+  if (!body.email || !body.password) return false
+  else return true
+}

@@ -1,42 +1,93 @@
 import { User } from '../models/user.model.js'
-import { ValidationError, InsertError } from '../../shared/errors/app.error.js'
+import {
+  ValidationError,
+  InsertError,
+  AppError,
+} from '../../shared/errors/app.error.js'
 import {
   isBody,
   bodyValidToRegisterUser,
+  bodyValidToLogin,
 } from '../../utils/bodyRequirements.js'
+import bcrypt from 'bcrypt'
+import { generateToken } from '../../utils/tokenSession.js'
 
 // Create a new user account
 const createUser = async (req, res, next) => {
-  const body = req.body
+  try {
+    const body = req.body
 
-  if (!isBody(body))
-    return next(
-      new ValidationError('Error: El cuerpo de la petición está vacío')
-    )
-
-  if (!bodyValidToRegisterUser(body))
-    return next(
-      new ValidationError(
-        'Error: Faltan campos obligatorios en el registro de usuario'
+    if (!isBody(body))
+      return next(
+        new ValidationError('Error: El cuerpo de la petición está vacío')
       )
-    )
 
-  const emailOnUse = await User.findOne({ email: body.email })
+    if (!bodyValidToRegisterUser(body))
+      return next(
+        new ValidationError(
+          'Error: Faltan campos obligatorios en el registro de usuario'
+        )
+      )
 
-  if (emailOnUse)
-    return next(new ValidationError('Error: El email ya está registrado'))
+    const emailOnUse = await User.findOne({ email: body.email })
 
-  const newUser = await User.create(body)
-  if (!newUser)
-    return next(
-      new InsertError('Error: No se pudo insertar el usuario en el servidor')
-    )
+    if (emailOnUse)
+      return next(new ValidationError('Error: El email ya está registrado'))
 
-  res
-    .status(201)
-    .json({ message: 'Usuario registrado con éxito', data: newUser })
+    const newUser = await User.create(body)
+    if (!newUser)
+      return next(
+        new InsertError('Error: No se pudo insertar el usuario en el servidor')
+      )
+
+    res
+      .status(201)
+      .json({ message: 'Usuario registrado con éxito', data: newUser })
+  } catch (error) {
+    next(new AppError('Error inesperado en el registro de usuario'))
+  }
 }
 
-//
+// Check credentials and generate a new session token
+const login = async (req, res, next) => {
+  try {
+    const body = req.body
 
-export { createUser }
+    if (!isBody(body))
+      return next(
+        new ValidationError('Error: El cuerpo de la petición está vacío')
+      )
+
+    if (!bodyValidToLogin(body))
+      return next(
+        new ValidationError(
+          'Error: Faltan campos obligatorios en el login de usuario'
+        )
+      )
+
+    const userFound = await User.findOne({ email: body.email }).select(
+      '+password'
+    )
+    let matchPass
+
+    if (userFound) {
+      const bodyPass = body.password
+      const encodePass = userFound.password
+      matchPass = await bcrypt.compare(bodyPass, encodePass)
+    }
+
+    if (!userFound || !matchPass)
+      return next(
+        new ValidationError('Error: Email de usuario o contraseña incorrectos')
+      )
+
+    const sessionToken = generateToken(userFound._id)
+    return res
+      .status(200)
+      .json({ message: 'Login realizado con éxito', sessionToken })
+  } catch (error) {
+    next(new AppError('Error inesperado en el login de usuario -> ' + error))
+  }
+}
+
+export { createUser, login }

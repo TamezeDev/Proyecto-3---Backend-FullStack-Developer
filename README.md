@@ -27,3 +27,51 @@ Backend del proyecto fullStack con los endpoints para proporcionar los datos nec
 ## Configuración
 
 - Se establece el dns del servicio en *1.1.1.1* (Cloudflare) y *8.8.8.8* (Google) para evitar conflictos de conexión con la base de datos en Mongo Atlas.
+
+## Instrucciones
+
+## Acceso a endpoints
+
+- Para garantizar el uso de las funciones de cada rol de usuario se deberá enviar el token de sesión para los endpoints que impliquen modificación de datos en la cabecerae de la petición.
+
+```javascript
+headers
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNjYxMmQxMWE1OWI5OGQyY2IzOTNhNSIsImlhdCI6MTc4NTA3NDU4NywiZXhwIjoxNzg1MTYwOTg3fQ.7ZyA18LgB-JVCfvNXCcrejCcfKP3BvmCeNp6oRSSpPs
+```
+
+## Usuarios
+
+### 1. Registro de usuario
+
+Envío mediante `POST` a:
+
+```text
+baseUrl/api/v1/users/create
+```
+
+```javascript
+body
+{
+  "name": "Alejandro",
+  "lastName": "García",
+  "email": "alejandro.dev@example.com",
+  "password": "Password123!",
+  "birthDate": "1995-04-15"
+}
+```
+
+### 2. Login de usuario
+
+Envío mediante `POST` a:
+
+```text
+baseUrl/api/v1/users/login
+```
+
+```javascript
+body
+{
+  "email": "alejandro.dev@example.com",
+  "password": "Password123!"
+}
+```
