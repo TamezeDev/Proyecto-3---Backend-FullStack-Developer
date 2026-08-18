@@ -11,6 +11,7 @@ const bookSchema = new Schema(
     synopsis: { type: String, trim: true, required: true },
     content: [{ type: String, required: true, trim: true }],
     genre: { type: mongoose.Types.ObjectId, ref: 'Genre' },
+    available: { type: Boolean, required: true, default: true },
   },
   {
     timestamps: true,

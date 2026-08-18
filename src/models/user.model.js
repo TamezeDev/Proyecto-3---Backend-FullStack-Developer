@@ -53,6 +53,21 @@ const userSchema = new Schema(
         dateAdded: { type: Date, default: Date.now, required: true },
       },
     ],
+    accountEnable: {
+      type: Boolean,
+      required: true,
+      default: true,
+    },
+    premiumAccount: {
+      type: mongoose.Types.ObjectId,
+      ref: 'PremiumAccount',
+    },
+    cardPayments: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'CardPayment',
+      },
+    ],
   },
   {
     timestamps: true,
@@ -62,7 +77,7 @@ const userSchema = new Schema(
 
 userSchema.pre('save', function (next) {
   this.password = bcrypt.hashSync(this.password, 10)
-  next
+  next()
 })
 
 const User = mongoose.model('User', userSchema, 'users')

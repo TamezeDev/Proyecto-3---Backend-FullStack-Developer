@@ -3,6 +3,7 @@ import {
   ValidationError,
   InsertError,
   AppError,
+  NotFoundError,
 } from '../../shared/errors/app.error.js'
 import {
   isBody,
@@ -133,4 +134,29 @@ const modifyPassword = async (req, res, next) => {
   }
 }
 
-export { createUser, login, modifyPassword }
+// Get all user
+const getUsers = async (_req, res, next) => {
+  try {
+    const users = await User.find()
+      .populate({
+        path: 'reading',
+        populate: [{ path: 'book', model: 'Book' }],
+      })
+      .populate({
+        path: 'library',
+        populate: [{ path: 'book', model: 'Book' }],
+      })
+      .populate('premiumAccount')
+      .populate('cardPayments')
+
+    if (users.length === 0)
+      return next(new NotFoundError('La lista de usuarios está vacía'))
+    res
+      .status(200)
+      .json({ message: 'Mostrando lista de usuarios', data: users })
+  } catch (error) {
+    next(new AppError('Error obteniendo datos de los usuarios -> ' + error))
+  }
+}
+
+export { createUser, login, modifyPassword, getUsers }

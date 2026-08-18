@@ -1,3 +1,4 @@
+import './src/models/index.js'
 import { initBackend, app } from './app.js'
 import dotenv from 'dotenv'
 

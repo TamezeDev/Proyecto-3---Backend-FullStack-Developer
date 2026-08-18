@@ -95,3 +95,23 @@ body
 
 - Se requiere de headers con el token de sesión para identificar el usuario el la base de datos.
 - Se gestionan errores de contraseñas que no cumplan el formato obligatorio.
+
+### 4. Obtener todos los datos de usuarios
+
+Envío mediante `GET` a:
+
+```text
+baseUrl/api/v1/users/
+```
+
+```javascript
+body
+{
+  "currentPass": "Password123!",
+  "newPass": "Password1234!",
+  "repeatNewPass": "Password1234!"
+}
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario el la base de datos. 
+- Solo un usuario con rol *admin* puede hacer uso de este endpoint
