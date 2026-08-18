@@ -8,6 +8,7 @@ import {
   isBody,
   bodyValidToRegisterUser,
   bodyValidToLogin,
+  bodyValidToChangePass,
 } from '../../utils/bodyRequirements.js'
 import bcrypt from 'bcrypt'
 import { generateToken } from '../../utils/tokenSession.js'
@@ -44,7 +45,7 @@ const createUser = async (req, res, next) => {
       .status(201)
       .json({ message: 'Usuario registrado con éxito', data: newUser })
   } catch (error) {
-    next(new AppError('Error inesperado en el registro de usuario'))
+    next(new AppError('Error inesperado en el registro de usuario -> ' + error))
   }
 }
 
@@ -90,4 +91,46 @@ const login = async (req, res, next) => {
   }
 }
 
-export { createUser, login }
+// Change current password encoding the new one
+const modifyPassword = async (req, res, next) => {
+  try {
+    const body = req.body
+
+    if (!isBody(body))
+      return next(
+        new ValidationError('Error: El cuerpo de la petición está vacío')
+      )
+
+    if (!bodyValidToChangePass(body))
+      return next(
+        new ValidationError(
+          'Error: Faltan campos obligatorios para el cambio de contraseña'
+        )
+      )
+
+    if (body.newPass !== body.repeatNewPass)
+      return next(new ValidationError('Error: Las contraseñas no coinciden'))
+
+    const user = await User.findById(body.userId).select('+password')
+    const matchCurrentPass = await bcrypt.compare(
+      body.currentPass,
+      user.password
+    )
+    if (!matchCurrentPass)
+      return next(
+        new ValidationError('Error: La contraseña actual no coincide')
+      )
+
+    user.password = body.newPass
+    const updated = await user.save()
+    updated.password = undefined
+
+    res
+      .status(200)
+      .json({ message: 'Contraseña modificada con éxito', data: updated })
+  } catch (error) {
+    next(new AppError('Error modificando contraseña de usuario -> ' + error))
+  }
+}
+
+export { createUser, login, modifyPassword }

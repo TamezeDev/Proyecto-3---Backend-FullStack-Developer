@@ -19,3 +19,8 @@ export const bodyValidToLogin = (body) => {
   if (!body.email || !body.password) return false
   else return true
 }
+
+export const bodyValidToChangePass = (body) => {
+  if (!body.currentPass || !body.newPass || !body.repeatNewPass) return false
+  else return true
+}

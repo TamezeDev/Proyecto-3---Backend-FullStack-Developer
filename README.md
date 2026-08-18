@@ -75,3 +75,23 @@ body
   "password": "Password123!"
 }
 ```
+
+### 3. Modificar un usuario su contraseña
+
+Envío mediante `PUT` a:
+
+```text
+baseUrl/api/v1/users/modifyPass
+```
+
+```javascript
+body
+{
+  "currentPass": "Password123!",
+  "newPass": "Password1234!",
+  "repeatNewPass": "Password1234!"
+}
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario el la base de datos.
+- Se gestionan errores de contraseñas que no cumplan el formato obligatorio.

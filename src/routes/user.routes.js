@@ -1,8 +1,16 @@
 import { Router } from 'express'
-import { createUser, login } from '../repositories/user.repository.js'
+import {
+  createUser,
+  login,
+  modifyPassword,
+} from '../repositories/user.repository.js'
+import { isAuth } from '../../shared/middlewares/auth.middleware.js'
+
 const router = Router()
 
 router.post('/create', createUser)
 router.post('/login', login)
+
+router.put('/modifyPass', isAuth(), modifyPassword)
 
 export default router
