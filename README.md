@@ -93,7 +93,7 @@ body
 }
 ```
 
-- Se requiere de headers con el token de sesión para identificar el usuario el la base de datos.
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
 - Se gestionan errores de contraseñas que no cumplan el formato obligatorio.
 
 ### 4. Obtener todos los datos de usuarios
@@ -113,5 +113,23 @@ body
 }
 ```
 
-- Se requiere de headers con el token de sesión para identificar el usuario el la base de datos. 
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos. 
 - Solo un usuario con rol *admin* puede hacer uso de este endpoint
+### 5. Modificar o poner una imagen de perfil al usuario
+
+Envío mediante `PUT` a:
+
+```text
+baseUrl/api/v1/users/imgProfile
+```
+
+```javascript
+FormData
+{
+  "image": imagen seleccionada
+}
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos. 
+- Si el usuario tiene foto anteriormente la elimina del servidor para ahorro de espacio
+

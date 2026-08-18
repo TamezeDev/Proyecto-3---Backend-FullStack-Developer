@@ -13,6 +13,7 @@ import {
 } from '../../utils/bodyRequirements.js'
 import bcrypt from 'bcrypt'
 import { generateToken } from '../../utils/tokenSession.js'
+import { deleteImgCloudinary } from '../../utils/cloudinary.utils.js'
 
 // Create a new user account
 const createUser = async (req, res, next) => {
@@ -159,4 +160,47 @@ const getUsers = async (_req, res, next) => {
   }
 }
 
-export { createUser, login, modifyPassword, getUsers }
+// Add or modify profile user image
+const modifyProfileImg = async (req, res, next) => {
+  try {
+    const image = req.file
+
+    if (!image) {
+      return next(new ValidationError('Es necesario adjuntar una imagen'))
+    }
+
+    const user = await User.findById(req.body.userId)
+    if (!user)
+      return next(
+        new NotFoundError('El usuario no se encuentra en el servidor')
+      )
+
+    const oldImageId = user.imageProfileId
+    /*    user.imageProfileUrl = image.path
+    user.imageProfileId = image.filename */
+
+    const updated = await User.findByIdAndUpdate(
+      req.body.userId,
+      { imageProfileUrl: image.path, imageProfileId: image.filename },
+      {
+        returnDocument: 'after',
+        runValidators: true,
+      }
+    )
+    /*     updated.password = undefined */
+
+    if (oldImageId) deleteImgCloudinary(oldImageId)
+
+    res
+      .status(200)
+      .json({ message: 'Imagen de perfil modificada correctamente', updated })
+  } catch (error) {
+    next(
+      new AppError(
+        'Error actualizando imagen de perfil del usuario -> ' + error
+      )
+    )
+  }
+}
+
+export { createUser, login, modifyPassword, getUsers, modifyProfileImg }

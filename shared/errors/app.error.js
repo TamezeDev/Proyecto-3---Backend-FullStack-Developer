@@ -36,6 +36,12 @@ class NotFoundError extends AppError {
   }
 }
 
+class CloudinaryError extends AppError {
+  constructor(message = 'Error actualizando el imagenes de cloudinary') {
+    super(message)
+  }
+}
+
 export {
   AppError,
   InsertError,
@@ -43,4 +49,5 @@ export {
   AuthError,
   ForbiddenError,
   NotFoundError,
+  CloudinaryError,
 }
