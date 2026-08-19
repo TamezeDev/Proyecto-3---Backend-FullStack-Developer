@@ -134,6 +134,18 @@ FormData
 - Se requiere de headers con el token de sesión para identificar el usuario en la base de datos. 
 - Si el usuario tiene foto anteriormente la elimina del servidor para ahorro de espacio
 
+### 6. Eliminar tarjeta de la lista de tarjetas del usuario
+
+Envío mediante `DELETE` a:
+
+```text
+baseUrl/api/v1/users/card/:id
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos. 
+- La tarjeta queda guardada en el servidor para uso de otro cliente que la pueda tener asociada
+
+
 ## Tarjetas de pago
 
 ### 1. Añadir una tarjeta a la lista del usuario

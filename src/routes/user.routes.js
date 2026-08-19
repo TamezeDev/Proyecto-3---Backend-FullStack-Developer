@@ -5,6 +5,7 @@ import {
   modifyPassword,
   getUsers,
   modifyProfileImg,
+  deleteUserCard,
 } from '../repositories/user.repository.js'
 import { isAuth } from '../../shared/middlewares/auth.middleware.js'
 import { upload } from '../../shared/middlewares/files.middleware.js'
@@ -18,5 +19,7 @@ router.post('/login', login)
 
 router.put('/modifyPass', isAuth(), modifyPassword)
 router.put('/imgProfile', upload.single('image'), isAuth(), modifyProfileImg)
+
+router.delete('/card/:id', isAuth(), deleteUserCard)
 
 export default router

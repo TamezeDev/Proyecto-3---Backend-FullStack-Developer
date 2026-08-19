@@ -12,6 +12,12 @@ class InsertError extends AppError {
   }
 }
 
+class DeleteError extends AppError {
+  constructor(message = 'Error eliminando datos en la base de datos') {
+    super(message, 400)
+  }
+}
+
 class ValidationError extends AppError {
   constructor(message) {
     super(message, 400)
@@ -45,6 +51,7 @@ class CloudinaryError extends AppError {
 export {
   AppError,
   InsertError,
+  DeleteError,
   ValidationError,
   AuthError,
   ForbiddenError,

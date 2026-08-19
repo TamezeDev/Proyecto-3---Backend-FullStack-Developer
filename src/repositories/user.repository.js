@@ -2,6 +2,7 @@ import { User } from '../models/user.model.js'
 import {
   ValidationError,
   InsertError,
+  DeleteError,
   AppError,
   NotFoundError,
 } from '../../shared/errors/app.error.js'
@@ -236,6 +237,45 @@ const addUserCard = async (userId, cardId, next) => {
     )
 }
 
+// Delete card from list
+const deleteUserCard = async (req, res, next) => {
+  try {
+    const userId = req.body.userId
+    const cardId = req.params.id
+
+    const user = await User.findById(userId)
+    if (!user) {
+      return next(
+        new NotFoundError('El usuario no se encuentra en el servidor')
+      )
+    }
+    console.log(user)
+
+    const cardExists = user.cardPayments.some(
+      (id) => id.toString() === cardId.toString()
+    )
+
+    if (!cardExists) {
+      return next(
+        new NotFoundError('La tarjeta no se encuentra en la lista del usuario')
+      )
+    }
+
+    const userUpdated = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { cardPayments: cardId } },
+      { new: true, runValidators: true }
+    )
+
+    res.status(200).json({
+      message: 'Tarjeta eliminada de la lista con éxito',
+      data: userUpdated,
+    })
+  } catch (error) {
+    next(new AppError('Error eliminando tarjeta del usuario -> ' + error))
+  }
+}
+
 export {
   createUser,
   login,
@@ -243,4 +283,5 @@ export {
   getUsers,
   modifyProfileImg,
   addUserCard,
+  deleteUserCard,
 }
