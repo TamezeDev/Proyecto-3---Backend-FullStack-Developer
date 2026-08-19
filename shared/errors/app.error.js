@@ -18,6 +18,12 @@ class DeleteError extends AppError {
   }
 }
 
+class UpdatingDataError extends AppError {
+  constructor(message = 'Error actulizando datos en la base de datos') {
+    super(message, 400)
+  }
+}
+
 class ValidationError extends AppError {
   constructor(message) {
     super(message, 400)
@@ -52,6 +58,7 @@ export {
   AppError,
   InsertError,
   DeleteError,
+  UpdatingDataError,
   ValidationError,
   AuthError,
   ForbiddenError,

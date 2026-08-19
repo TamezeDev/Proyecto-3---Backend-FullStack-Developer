@@ -3,6 +3,7 @@ import {
   ValidationError,
   InsertError,
   AppError,
+  DeleteError,
   NotFoundError,
 } from '../../shared/errors/app.error.js'
 import {
@@ -70,7 +71,7 @@ export const deleteCardPayment = async (req, res, next) => {
     const cardDeleted = await CardPayment.findByIdAndDelete(cardId)
     if (!cardDeleted)
       return next(
-        new NotFoundError(
+        new DeleteError(
           'No se ha encontrado el id de la tarjeta en el servidor'
         )
       )
@@ -113,7 +114,7 @@ export const addCreditToCard = async (req, res, next) => {
         $inc: { credit: body.quantity },
       },
       {
-        new: true,
+        returnDocument: 'after',
         runValidators: true,
       }
     )
@@ -131,4 +132,25 @@ export const addCreditToCard = async (req, res, next) => {
     }
     next(new AppError('Error añadiendo crédito a la tarjeta -> ' + error))
   }
+}
+
+// Decrease credit after payment
+export const doPremiumPayment = async (userId, cardId, quanty, session) => {
+  if (!userId || !cardId || !quanty)
+    throw new ValidationError('Los datos enviados no son válidos')
+
+  await userHasCard(userId, cardId, session)
+
+  const card = await CardPayment.findById(cardId).session(session)
+  if (!card) throw new NotFoundError('Tarjeta no encontrada')
+  if (card.credit < quanty)
+    throw new ValidationError('Saldo insuficiente para realizar el pago')
+
+  const cardPayment = await CardPayment.findByIdAndUpdate(
+    cardId,
+    { $inc: { credit: -quanty } },
+    { returnDocument: 'after', runValidators: true, session }
+  )
+  if (!cardPayment)
+    throw new NotFoundError('Error: No se pudo efectuar el pago')
 }

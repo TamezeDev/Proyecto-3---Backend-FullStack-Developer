@@ -200,3 +200,93 @@ body
 - Para ingresar saldo, la tarjeta debe estar asociada a la lista de un usuario
 - Se comprueba el tipo de dato enviado para transformar a Number y sumar al crédito actual
 
+## Cuenta premium
+
+### 1. Activar o renovar cuenta premium de usuario
+
+Envío mediante `POST` a:
+
+```text
+baseUrl/api/v1/premium/setPremium
+```
+
+```javascript
+body
+{
+  "plan": "Plan Anual",
+  "cardId": "66a1f3c9e4b0a2d1f8c9e123"
+}
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- El campo `plan` debe coincidir con el `name` de un plan existente en el catálogo (`baseUrl/api/v1/plans/`).
+- El campo `cardId` debe corresponder a una tarjeta ya asociada a la lista de tarjetas del usuario (ver *Añadir una tarjeta a la lista del usuario*).
+- Se comprueba que la tarjeta tenga saldo suficiente para cubrir el precio del plan antes de efectuar el cobro.
+- Si el usuario no tenía cuenta premium previamente, se crea una nueva; si ya la tenía, se actualiza con la nueva duración y fecha de próximo pago, y se añade la fecha del pago al historial.
+- El cobro y la activación/actualización de la cuenta premium se ejecutan dentro de una transacción: si algo falla al guardar la cuenta premium, el cobro se revierte automáticamente.
+
+## Planes premium
+
+### 1. Obtener todos los planes premium
+
+Envío mediante `GET` a:
+
+```text
+baseUrl/api/v1/plans/
+```
+
+- No requiere token de sesión, cualquier cliente puede consultar los planes disponibles para mostrarlos en el front antes de contratar uno.
+
+### 2. Crear un nuevo plan premium
+
+Envío mediante `POST` a:
+
+```text
+baseUrl/api/v1/plans/create
+```
+
+```javascript
+body
+{
+  "name": "Plan Anual",
+  "durationMonths": 12,
+  "price": 59.99
+}
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Esta operación solo se puede realizar por administradores.
+- Se valida que no exista previamente un plan con el mismo nombre.
+
+### 3. Modificar un plan premium
+
+Envío mediante `PUT` a:
+
+```text
+baseUrl/api/v1/plans/modify/:id
+```
+
+```javascript
+body
+{
+  "name": "Plan Anual Promo",
+  "price": 49.99,
+  "durationMonths": 12
+}
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Esta operación solo se puede realizar por administradores.
+- Se puede enviar cualquier combinación de `name`, `price` y `durationMonths`; solo se actualizan los campos incluidos en el body.
+
+### 4. Eliminar un plan premium
+
+Envío mediante `DELETE` a:
+
+```text
+baseUrl/api/v1/plans/:id
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Esta operación solo se puede realizar por administradores.
+- Elimina el plan del catálogo; no afecta a las cuentas premium ya activas con la duración/precio contratados previamente.

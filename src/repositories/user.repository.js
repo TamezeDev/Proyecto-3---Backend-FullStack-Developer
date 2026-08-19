@@ -2,7 +2,7 @@ import { User } from '../models/user.model.js'
 import {
   ValidationError,
   InsertError,
-  DeleteError,
+  UpdatingDataError,
   AppError,
   NotFoundError,
 } from '../../shared/errors/app.error.js'
@@ -242,7 +242,7 @@ const deleteUserCard = async (req, res, next) => {
     const userUpdated = await User.findByIdAndUpdate(
       userId,
       { $pull: { cardPayments: cardId } },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     )
 
     res.status(200).json({
@@ -264,8 +264,8 @@ const globalDeleteCard = async (cardId) => {
 }
 
 // Check if user has card sent
-const userHasCard = async (userId, cardId) => {
-  const user = await User.findById(userId)
+const userHasCard = async (userId, cardId, session) => {
+  const user = await User.findById(userId).session(session)
   if (!user) {
     throw new NotFoundError('El usuario no se encuentra en el servidor')
   }
@@ -280,6 +280,33 @@ const userHasCard = async (userId, cardId) => {
   }
 }
 
+// Get userPremium account ID
+const getUserPremiumAccountId = async (userId, session) => {
+  if (!userId) throw new ValidationError('Error: Id de usuario requerido')
+
+  const user = await User.findById(userId).session(session)
+  if (!user) {
+    throw new NotFoundError('El usuario no se encuentra en el servidor')
+  }
+
+  return user.premiumAccount
+}
+
+// Set a first time premium account id
+const setUserPremiumAccount = async (userId, premiumAccountId, session) => {
+  if (!userId || !premiumAccountId)
+    throw new ValidationError(
+      'Error: Se requiren ids de usuario y de cuenta premium'
+    )
+  const userUpdated = await User.findByIdAndUpdate(
+    userId,
+    { premiumAccount: premiumAccountId },
+    { returnDocument: 'after', runValidators: true, session }
+  )
+  if (!userUpdated)
+    throw new UpdatingDataError('Error asociando cuenta premium de usuario')
+}
+
 export {
   createUser,
   login,
@@ -290,4 +317,6 @@ export {
   deleteUserCard,
   globalDeleteCard,
   userHasCard,
+  getUserPremiumAccountId,
+  setUserPremiumAccount,
 }

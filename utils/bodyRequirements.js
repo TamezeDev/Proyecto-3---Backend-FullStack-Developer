@@ -45,3 +45,17 @@ export const bodyValidToAddCreditCard = (body) => {
   }
   return true
 }
+
+export const bodyValidToSetPremiumAccount = (body) => {
+  if (!body.plan || !body.cardId) return false
+  return true
+}
+
+export const bodyValidToCreatePremiumPlan = (body) => {
+  if (!body.name || !body.durationMonths || !body.price) return false
+  return true
+}
+
+export const bodyValidToUpdatePremiumPlan = (body) => {
+  return Boolean(body.name || body.price || body.durationMonths)
+}
