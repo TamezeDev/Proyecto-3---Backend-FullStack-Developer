@@ -5,11 +5,16 @@ import {
   AppError,
   NotFoundError,
 } from '../../shared/errors/app.error.js'
-import { addUserCard, globalDeleteCard } from './user.repository.js'
+import {
+  addUserCard,
+  globalDeleteCard,
+  userHasCard,
+} from './user.repository.js'
 
 import {
   isBody,
   bodyValidToRegisterCard,
+  bodyValidToAddCreditCard,
 } from '../../utils/bodyRequirements.js'
 
 // Create new card
@@ -36,12 +41,19 @@ export const newCard = async (req, res, next) => {
       return next(
         new InsertError('Error: No se pudo insertar la tarjeta en el servidor')
       )
-    await addUserCard(body.userId, card._id, next)
+    await addUserCard(body.userId, card._id)
 
     res
       .status(201)
       .json({ message: 'Tarjeta registrada con éxito', data: card })
   } catch (error) {
+    if (
+      error.status ||
+      error.name === 'ValidationError' ||
+      error.name === 'NotFoundError'
+    ) {
+      return next(error)
+    }
     next(
       new AppError(
         'Error inesperado en el registro de una nueva tarjeta -> ' + error
@@ -63,7 +75,6 @@ export const deleteCardPayment = async (req, res, next) => {
         )
       )
     const impliedUsers = await globalDeleteCard(cardId)
-    console.log(impliedUsers)
 
     res.status(200).json({
       message: 'Tarjeta eliminada del servidor completamente',
@@ -72,5 +83,52 @@ export const deleteCardPayment = async (req, res, next) => {
     })
   } catch (error) {
     next(new AppError('Error eliminando la tarjeta del servidor -> ' + error))
+  }
+}
+
+// Increase quantity selected in card
+export const addCreditToCard = async (req, res, next) => {
+  try {
+    const body = req.body
+
+    if (!isBody(body))
+      return next(
+        new ValidationError('Error: El cuerpo de la petición está vacío')
+      )
+
+    if (!bodyValidToAddCreditCard(body))
+      return next(
+        new ValidationError(
+          'Error: Formato incorrecto de los datos necesarios para realizar esta operación'
+        )
+      )
+
+    const cardId = req.params.id
+
+    await userHasCard(body.userId, cardId)
+
+    const cardUpdated = await CardPayment.findByIdAndUpdate(
+      cardId,
+      {
+        $inc: { credit: body.quantity },
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    )
+    if (!cardUpdated)
+      return next(
+        new NotFoundError('No se pudo actualizar el crédito en su tarjeta')
+      )
+    res.status(200).json({
+      message: 'Crédito añadido con éxito a la tarjeta',
+      data: cardUpdated,
+    })
+  } catch (error) {
+    if (error.status || error.name === 'NotFoundError') {
+      return next(error)
+    }
+    next(new AppError('Error añadiendo crédito a la tarjeta -> ' + error))
   }
 }

@@ -202,24 +202,20 @@ const modifyProfileImg = async (req, res, next) => {
 }
 
 // Add new card payment
-const addUserCard = async (userId, cardId, next) => {
+const addUserCard = async (userId, cardId) => {
   if (!cardId)
-    return next(
-      new ValidationError(
-        'Es necesario adjuntar los datos de la tarjeta guardados'
-      )
+    throw new ValidationError(
+      'Es necesario adjuntar los datos de la tarjeta guardados'
     )
 
   const user = await User.findById(userId)
   if (!user)
-    return next(new NotFoundError('El usuario no se encuentra en el servidor'))
+    throw new NotFoundError('El usuario no se encuentra en el servidor')
 
   const cardslist = user.cardPayments
   const hadUserCard = cardslist.includes(cardId.toString())
   if (hadUserCard)
-    return next(
-      new ValidationError('La tarjeta ya está registrada en su lista')
-    )
+    throw new ValidationError('La tarjeta ya está registrada en su lista')
 
   cardslist.push(cardId)
 
@@ -232,9 +228,7 @@ const addUserCard = async (userId, cardId, next) => {
     }
   )
   if (!updated)
-    return next(
-      new InsertError('Error guardando la tarjeta en la lista del usuario')
-    )
+    throw new InsertError('Error guardando la tarjeta en la lista del usuario')
 }
 
 // Delete card from list
@@ -243,23 +237,7 @@ const deleteUserCard = async (req, res, next) => {
     const userId = req.body.userId
     const cardId = req.params.id
 
-    const user = await User.findById(userId)
-    if (!user) {
-      return next(
-        new NotFoundError('El usuario no se encuentra en el servidor')
-      )
-    }
-    console.log(user)
-
-    const cardExists = user.cardPayments.some(
-      (id) => id.toString() === cardId.toString()
-    )
-
-    if (!cardExists) {
-      return next(
-        new NotFoundError('La tarjeta no se encuentra en la lista del usuario')
-      )
-    }
+    await userHasCard(userId, cardId)
 
     const userUpdated = await User.findByIdAndUpdate(
       userId,
@@ -285,6 +263,23 @@ const globalDeleteCard = async (cardId) => {
   return updateResult.modifiedCount
 }
 
+// Check if user has card sent
+const userHasCard = async (userId, cardId) => {
+  const user = await User.findById(userId)
+  if (!user) {
+    throw new NotFoundError('El usuario no se encuentra en el servidor')
+  }
+
+  const cardExists = user.cardPayments.some(
+    (id) => id.toString() === cardId.toString()
+  )
+  if (!cardExists) {
+    throw new NotFoundError(
+      'La tarjeta no se encuentra en la lista del usuario'
+    )
+  }
+}
+
 export {
   createUser,
   login,
@@ -294,4 +289,5 @@ export {
   addUserCard,
   deleteUserCard,
   globalDeleteCard,
+  userHasCard,
 }

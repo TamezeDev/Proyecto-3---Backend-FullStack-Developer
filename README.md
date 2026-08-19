@@ -180,3 +180,23 @@ baseUrl/api/v1/cards/:id
 
 - Se requiere de headers con el token de sesión para identificar el usuario en la base de datos. 
 - Esta operación solo se puede realizar por administradores. Elimina la tarjeta del servidor y la desvincula de todo usuario que la tenga en su lista. (Por motivos de tarjeta fraudulenta o similar)
+
+### 3. Añadir crédito a una tarjeta
+
+Envío mediante `POST` a:
+
+```text
+baseUrl/api/v1/cards/addCredit/:id
+```
+
+```javascript
+body
+{
+  "quantity": "12.50"
+}
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos. 
+- Para ingresar saldo, la tarjeta debe estar asociada a la lista de un usuario
+- Se comprueba el tipo de dato enviado para transformar a Number y sumar al crédito actual
+

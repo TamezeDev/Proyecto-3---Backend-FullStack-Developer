@@ -30,3 +30,18 @@ export const bodyValidToRegisterCard = (body) => {
     return false
   else return true
 }
+
+export const bodyValidToAddCreditCard = (body) => {
+  if (!body.quantity) return false
+  else if (typeof body.quantity === 'string') {
+    const regex = /^\d+(\.\d+)?$/
+    if (!regex.test(body.quantity)) return false
+
+    body.quantity = Number(body.quantity)
+
+    if (body.quantity <= 0) return false
+  } else {
+    if (body.quantity <= 0) return false
+  }
+  return true
+}
