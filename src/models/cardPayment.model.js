@@ -50,6 +50,12 @@ const cardPaymentSchema = new Schema(
       trim: true,
       match: [/^\d{3,4}$/, 'El CVV debe tener 3 o 4 dígitos numéricos'],
     },
+    credit: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0,
+    },
   },
   {
     timestamps: true,

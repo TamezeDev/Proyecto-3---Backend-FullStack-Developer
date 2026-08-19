@@ -276,6 +276,15 @@ const deleteUserCard = async (req, res, next) => {
   }
 }
 
+// Delete card on users that take it associated when admin delete that card from server due to some reason
+const globalDeleteCard = async (cardId) => {
+  const updateResult = await User.updateMany(
+    { cardPayments: cardId },
+    { $pull: { cardPayments: cardId } }
+  )
+  return updateResult.modifiedCount
+}
+
 export {
   createUser,
   login,
@@ -284,4 +293,5 @@ export {
   modifyProfileImg,
   addUserCard,
   deleteUserCard,
+  globalDeleteCard,
 }

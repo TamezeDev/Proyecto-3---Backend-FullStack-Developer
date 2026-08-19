@@ -5,7 +5,7 @@ import {
   AppError,
   NotFoundError,
 } from '../../shared/errors/app.error.js'
-import { addUserCard } from './user.repository.js'
+import { addUserCard, globalDeleteCard } from './user.repository.js'
 
 import {
   isBody,
@@ -47,5 +47,30 @@ export const newCard = async (req, res, next) => {
         'Error inesperado en el registro de una nueva tarjeta -> ' + error
       )
     )
+  }
+}
+
+// Delete card from server(only admins)
+export const deleteCardPayment = async (req, res, next) => {
+  try {
+    const cardId = req.params.id
+
+    const cardDeleted = await CardPayment.findByIdAndDelete(cardId)
+    if (!cardDeleted)
+      return next(
+        new NotFoundError(
+          'No se ha encontrado el id de la tarjeta en el servidor'
+        )
+      )
+    const impliedUsers = await globalDeleteCard(cardId)
+    console.log(impliedUsers)
+
+    res.status(200).json({
+      message: 'Tarjeta eliminada del servidor completamente',
+      data: cardDeleted,
+      impliedUsers,
+    })
+  } catch (error) {
+    next(new AppError('Error eliminando la tarjeta del servidor -> ' + error))
   }
 }

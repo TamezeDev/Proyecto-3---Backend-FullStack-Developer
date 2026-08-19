@@ -168,3 +168,15 @@ body
 
 - Se requiere de headers con el token de sesión para identificar el usuario en la base de datos. 
 - Se validará los datos recibidos, como fecha de caducidad, formatos, ...
+
+### 2. Eliminar tarjeta del servidor
+
+Envío mediante `DELETE` a:
+
+```text
+baseUrl/api/v1/cards/:id
+```
+
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos. 
+- Esta operación solo se puede realizar por administradores. Elimina la tarjeta del servidor y la desvincula de todo usuario que la tenga en su lista. (Por motivos de tarjeta fraudulenta o similar)
