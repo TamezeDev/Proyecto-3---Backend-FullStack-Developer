@@ -1,6 +1,7 @@
 import cloudinary from 'cloudinary'
 import { CloudinaryError } from '../shared/errors/app.error.js'
 
+// Delete a image from cloudinary server receiving imgId
 const deleteImgCloudinary = async (imgId) => {
   if (!imgId) return
   try {

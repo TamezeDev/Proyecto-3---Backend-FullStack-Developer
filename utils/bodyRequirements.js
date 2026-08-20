@@ -59,3 +59,15 @@ export const bodyValidToCreatePremiumPlan = (body) => {
 export const bodyValidToUpdatePremiumPlan = (body) => {
   return Boolean(body.name || body.price || body.durationMonths)
 }
+
+export const bodyValidToCreateBook = (body) => {
+  return Boolean(
+    body.bookName &&
+    body.isbn &&
+    body.pages > 0 &&
+    body.synopsis &&
+    Array.isArray(body.content) &&
+    body.content.length > 0 &&
+    body.genreName
+  )
+}

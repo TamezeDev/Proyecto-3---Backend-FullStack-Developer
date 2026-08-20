@@ -294,3 +294,37 @@ baseUrl/api/v1/plans/:id
 - Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
 - Esta operación solo se puede realizar por administradores.
 - Elimina el plan del catálogo; no afecta a las cuentas premium ya activas con la duración/precio contratados previamente.
+
+## Libros
+
+### 1. Añadir un nuevo libro al catálogo
+
+Envío mediante `POST` a:
+
+```text
+baseUrl/api/v1/books/create
+```
+
+```javascript
+body
+{
+  "bookName": "Cien años de soledad",
+  "isbn": "9780307474728",
+  "author": "Gabriel García Márquez",
+  "pages": 471,
+  "synopsis": "La historia de la familia Buendía a lo largo de siete generaciones en el pueblo ficticio de Macondo.",
+  "content": [
+    "Texto de la página 1...",
+    "Texto de la página 2...",
+    "Texto de la página 3..."
+  ],
+  "genreName": "Realismo mágico"
+}
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Esta operación solo se puede realizar por administradores.
+- El campo `isbn` debe ser único; si ya existe un libro con ese ISBN, la petición se rechaza.
+- El campo `content` almacena el texto del libro dividido por páginas, uno por posición del array, y es lo que se sirve al usuario premium cuando lee el libro online.
+- El campo `genreName` se envía como texto: si el género ya existe en la base de datos se reutiliza, y si no existe se crea automáticamente y se asocia al libro.
+- El campo `available` no se envía en la creación; se establece en `true` por defecto y se gestiona posteriormente para marcar libros como no disponibles sin eliminarlos del catálogo.

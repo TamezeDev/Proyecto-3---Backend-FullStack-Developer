@@ -1,5 +1,5 @@
 import cron from 'node-cron'
-import { PremiumAccount } from '../../src/models/premiumAccount.model'
+import { PremiumAccount } from '../../src/models/premiumAccount.model.js'
 
 // Daily task to find expired premium accounts and set them disabled
 export const startPremiumExpirationTask = () => {
