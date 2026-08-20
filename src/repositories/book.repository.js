@@ -77,6 +77,98 @@ export const addBook = async (req, res, next) => {
   }
 }
 
+// Disable a book from catalog
+export const setNoAvailableBook = async (req, res, next) => {
+  try {
+    const bookId = req.params.id
+
+    if (!bookId)
+      return next(new ValidationError('Error: Id de libro requerido'))
+
+    const deletedBook = await Book.findByIdAndUpdate(
+      bookId,
+      {
+        available: false,
+      },
+      { returnDocument: 'after', runValidators: true }
+    )
+    if (!deletedBook)
+      return next(new NotFoundError('El libro no se encuentra en el servidor'))
+
+    res.status(200).json({
+      message: 'Libro desactivado del catálogo con éxito',
+      data: deletedBook,
+    })
+  } catch (error) {
+    next(new AppError('Error eliminando el libro del catálogo -> ' + error))
+  }
+}
+
+// Enable a book from catalog
+export const setAvailableBook = async (req, res, next) => {
+  try {
+    const bookId = req.params.id
+
+    if (!bookId)
+      return next(new ValidationError('Error: Id de libro requerido'))
+
+    const activeBook = await Book.findByIdAndUpdate(
+      bookId,
+      {
+        available: true,
+      },
+      { returnDocument: 'after', runValidators: true }
+    )
+    if (!activeBook)
+      return next(new NotFoundError('El libro no se encuentra en el servidor'))
+
+    res.status(200).json({
+      message: 'Libro activo en el catálogo con éxito',
+      data: activeBook,
+    })
+  } catch (error) {
+    next(new AppError('Error activando el libro del catálogo -> ' + error))
+  }
+}
+
+// Get all available books for the catalog
+export const getAvailableBooks = async (_req, res, next) => {
+  try {
+    const books = await Book.find({ available: true }).populate('genre')
+
+    if (books.length === 0)
+      return next(new NotFoundError('El catálogo de libros está vacío'))
+
+    res
+      .status(200)
+      .json({ message: 'Mostrando catálogo de libros', data: books })
+  } catch (error) {
+    next(new AppError('Error obteniendo el catálogo de libros -> ' + error))
+  }
+}
+
+// Get all disabled books for the catalog
+export const getDisableBooks = async (_req, res, next) => {
+  try {
+    const books = await Book.find({ available: false }).populate('genre')
+
+    if (books.length === 0)
+      return next(
+        new NotFoundError('El catálogo de libros desactivados está vacío')
+      )
+
+    res.status(200).json({
+      message: 'Mostrando catálogo de libros desactivados',
+      data: books,
+    })
+  } catch (error) {
+    next(
+      new AppError(
+        'Error obteniendo el catálogo de libros desactivados -> ' + error
+      )
+    )
+  }
+}
 /* ===================
     PRIVATE METHODS
 ======================*/

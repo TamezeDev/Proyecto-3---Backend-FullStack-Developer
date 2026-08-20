@@ -324,7 +324,53 @@ body
 
 - Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
 - Esta operación solo se puede realizar por administradores.
+- El campo `author` es opcional; si no se envía, se asigna automáticamente `"Anónimo"`.
 - El campo `isbn` debe ser único; si ya existe un libro con ese ISBN, la petición se rechaza.
-- El campo `content` almacena el texto del libro dividido por páginas, uno por posición del array, y es lo que se sirve al usuario premium cuando lee el libro online.
-- El campo `genreName` se envía como texto: si el género ya existe en la base de datos se reutiliza, y si no existe se crea automáticamente y se asocia al libro.
-- El campo `available` no se envía en la creación; se establece en `true` por defecto y se gestiona posteriormente para marcar libros como no disponibles sin eliminarlos del catálogo.
+- El campo `genreName` se envía como texto: si el género ya existe se reutiliza, y si no existe se crea automáticamente.
+- El libro se crea con `available: true` por defecto.
+
+### 2. Obtener catálogo de libros disponibles
+
+Envío mediante `GET` a:
+
+```text
+baseUrl/api/v1/books/
+```
+
+- No requiere token de sesión, cualquier cliente puede consultar el catálogo público.
+- Solo devuelve los libros con `available: true`.
+
+### 3. Obtener libros desactivados
+
+Envío mediante `GET` a:
+
+```text
+baseUrl/api/v1/books/disabled
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Esta operación solo se puede realizar por administradores.
+- Devuelve los libros con `available: false`  para gestionar el catálogo.
+### 4. Activar un libro en el catálogo
+
+Envío mediante `PUT` a:
+
+```text
+baseUrl/api/v1/books/enable/:id
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Esta operación solo se puede realizar por administradores.
+- Marca el libro como `available: true`, haciéndolo visible en el catálogo público.
+
+### 5. Desactivar un libro del catálogo
+
+Envío mediante `PUT` a:
+
+```text
+baseUrl/api/v1/books/disable/:id
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Esta operación solo se puede realizar por administradores.
+- Marca el libro como `available: false` en vez de eliminarlo físicamente, para no romper las referencias de los usuarios que lo tengan en su biblioteca personal o en lectura actual.
