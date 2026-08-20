@@ -169,6 +169,23 @@ export const getDisableBooks = async (_req, res, next) => {
     )
   }
 }
+
+// Is book available in db
+export const isBookIdOnDb = async (bookID) => {
+  if (!bookID) throw new ValidationError('Debe enviar el id del libro')
+  const book = await Book.findById(bookID)
+  if (!book) throw new NotFoundError('El libro no se encuentra en el servidor')
+  return Boolean(book && book.available)
+}
+
+// Get book by id for backend
+export const getBookById = async (bookId) => {
+  if (!bookId) throw new ValidationError('Debe enviar el id del libro')
+  const book = await Book.findById(bookId)
+  if (!book) throw new NotFoundError('El libro no se encuentra en el servidor')
+  return book
+}
+
 /* ===================
     PRIVATE METHODS
 ======================*/

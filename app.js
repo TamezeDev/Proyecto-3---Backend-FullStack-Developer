@@ -6,6 +6,8 @@ import {
 import { startPremiumExpirationTask } from './shared/tasks/premiumExpiration.task.js'
 import { connect } from './config/database.config.js'
 import userRoutes from './src/routes/user.routes.js'
+import libraryRoutes from './src/routes/library.routes.js'
+import readingRoutes from './src/routes/reading.routes.js'
 import cardPaymentRoutes from './src/routes/cardPayment.routes.js'
 import premiumAccountRoutes from './src/routes/premiumAccount.routes.js'
 import premiumPricesRoutes from './src/routes/premiumPrice.routes.js'
@@ -20,6 +22,8 @@ const initBackend = async () => {
   app.use(express.json())
   // Endpoints
   app.use(`${BASE_URL}/users`, userRoutes)
+  app.use(`${BASE_URL}/users`, libraryRoutes)
+  app.use(`${BASE_URL}/users`, readingRoutes)
   app.use(`${BASE_URL}/cards`, cardPaymentRoutes)
   app.use(`${BASE_URL}/premium`, premiumAccountRoutes)
   app.use(`${BASE_URL}/plans`, premiumPricesRoutes)

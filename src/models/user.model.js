@@ -42,14 +42,14 @@ const userSchema = new Schema(
     imageProfileId: { type: String, trim: true },
     reading: [
       {
-        book: { type: mongoose.Types.ObjectId, ref: 'Book', unique: true },
+        book: { type: mongoose.Types.ObjectId, ref: 'Book' },
         currentPage: { type: Number, default: 1, required: true },
         lastRead: { type: Date, default: Date.now, required: true },
       },
     ],
     library: [
       {
-        book: { type: mongoose.Types.ObjectId, ref: 'Book', unique: true },
+        book: { type: mongoose.Types.ObjectId, ref: 'Book' },
         dateAdded: { type: Date, default: Date.now, required: true },
       },
     ],
@@ -76,8 +76,10 @@ const userSchema = new Schema(
 )
 
 userSchema.pre('save', function (next) {
+  if (!this.isModified('password')) return next
+
   this.password = bcrypt.hashSync(this.password, 10)
-  next()
+  next
 })
 
 const User = mongoose.model('User', userSchema, 'users')

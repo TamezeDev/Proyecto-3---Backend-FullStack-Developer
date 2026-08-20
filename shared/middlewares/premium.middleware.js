@@ -1,5 +1,5 @@
-import { User } from '../../src/models/user.model'
-import { ForbiddenError, AppError } from '../errors/app.error'
+import { User } from '../../src/models/user.model.js'
+import { ForbiddenError, AppError } from '../errors/app.error.js'
 
 // Middleware to check if user has an active premium account
 const isPremium = async (req, _res, next) => {

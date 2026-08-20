@@ -374,3 +374,112 @@ baseUrl/api/v1/books/disable/:id
 - Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
 - Esta operación solo se puede realizar por administradores.
 - Marca el libro como `available: false` en vez de eliminarlo físicamente, para no romper las referencias de los usuarios que lo tengan en su biblioteca personal o en lectura actual.
+
+## Biblioteca y lectura
+
+### 1. Añadir un libro a la biblioteca
+
+Envío mediante `POST` a:
+
+```text
+baseUrl/api/v1/users/library/:id
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Se requiere cuenta premium activa.
+- `:id` es el id del libro a añadir; debe existir y estar disponible en el catálogo.
+- Si el libro ya está en la biblioteca del usuario, la petición se rechaza.
+
+### 2. Eliminar un libro de la biblioteca
+
+Envío mediante `DELETE` a:
+
+```text
+baseUrl/api/v1/users/library/:id
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Si el libro también estaba en la lista de lectura actual, se elimina de ambas listas a la vez.
+
+### 3. Obtener la biblioteca del usuario
+
+Envío mediante `GET` a:
+
+```text
+baseUrl/api/v1/users/library
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Devuelve la lista de libros de la biblioteca con los datos del libro ya incluidos (populate), lista para mostrar en el front.
+
+### 4. Empezar a leer un libro
+
+Envío mediante `POST` a:
+
+```text
+baseUrl/api/v1/users/reading/:id
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Se requiere cuenta premium activa.
+- El libro debe estar previamente en la biblioteca del usuario.
+- Si el libro ya está en la lista de lectura actual, la petición se rechaza.
+- Se inicializa `currentPage` según el valor por defecto del modelo.
+
+### 5. Dejar de leer un libro
+
+Envío mediante `DELETE` a:
+
+```text
+baseUrl/api/v1/users/reading/:id
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Se requiere cuenta premium activa.
+- Elimina el libro de la lista de lectura actual, tanto si se ha terminado como si se ha abandonado.
+
+### 6. Obtener la lista de libros en lectura actual
+
+Envío mediante `GET` a:
+
+```text
+baseUrl/api/v1/users/reading
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Se requiere cuenta premium activa; este endpoint queda deliberadamente bloqueado para usuarios sin premium.
+- Devuelve la lista de lectura con los datos del libro ya incluidos (populate).
+
+### 7. Obtener el progreso de lectura de un libro
+
+Envío mediante `GET` a:
+
+```text
+baseUrl/api/v1/users/reading/:id
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Se requiere cuenta premium activa.
+- `:id` es el id del libro cuyo progreso quieres consultar.
+- Devuelve `currentPage`, `lastRead` y los datos del libro.
+
+### 8. Actualizar la página de lectura de un libro
+
+Envío mediante `PUT` a:
+
+```text
+baseUrl/api/v1/users/reading/:id
+```
+
+```javascript
+body
+{
+  "currentPage": 45
+}
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Se requiere cuenta premium activa.
+- El libro debe estar previamente en la lista de lectura actual del usuario.
+- Se valida que `currentPage` no supere el número total de páginas del libro (`pages`), comprobado siempre contra el dato guardado en el servidor, no contra ningún valor enviado por el cliente.
+- Actualiza también `lastRead` a la fecha actual.
