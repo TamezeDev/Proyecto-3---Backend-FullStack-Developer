@@ -3,6 +3,7 @@ import {
   unexpectedError,
   notFoundError,
 } from './shared/middlewares/error.middleware.js'
+import { startPremiumExpirationTask } from './shared/tasks/premiumExpiration.task.js'
 import { connect } from './config/database.config.js'
 import userRoutes from './src/routes/user.routes.js'
 import cardPaymentRoutes from './src/routes/cardPayment.routes.js'
@@ -24,6 +25,8 @@ const initBackend = async () => {
   // Middlewares
   app.use(notFoundError)
   app.use(unexpectedError)
+  // Tasks
+  startPremiumExpirationTask()
 }
 
 export { initBackend, app }

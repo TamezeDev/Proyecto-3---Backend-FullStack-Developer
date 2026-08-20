@@ -11,6 +11,9 @@ Backend del proyecto fullStack con los endpoints para proporcionar los datos nec
 - Los administradores son los únicos que pueden modificar libros y gestionar el catálogo
 - Se generaran libros y usuarios desde un Excel para poblar minimamente la base de datos. El sistema transformará los datos con formato antiguo a datos válidos para mongo mediante código
 - Se usará tokens de sesión para validar el acceso a los endpoints
+- Habrá un sistema de pago interno mediante tarjetas con credito (simulación)
+- El acceso a la lectura y la modificación de la librería es solo para usuarios premium
+- Los administradores pueden gestionar los planes premium
 
 
 ## Dependencias 
@@ -23,6 +26,7 @@ Backend del proyecto fullStack con los endpoints para proporcionar los datos nec
 - JsonWebToken (JWT para comprobar sesiones activas, roles, ...)
 - Multer (acceso a ficheros enviados)
 - Storage Cloudinary (Guardado de imagenes remoto)
+- Node-cron (Tarea diaria para revisar y desactivar cuentas premium)
 
 ## Configuración
 

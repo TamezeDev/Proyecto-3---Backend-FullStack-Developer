@@ -2,6 +2,7 @@ import multer from 'multer'
 import { cloudinary } from '../../config/cloudinary.config.js'
 import { CloudinaryStorage } from 'multer-storage-cloudinary'
 
+// Middleware to upload to cloudinary images checking allowed_formats
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
