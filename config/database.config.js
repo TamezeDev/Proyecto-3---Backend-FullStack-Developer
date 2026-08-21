@@ -1,10 +1,15 @@
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { setServers } from 'node:dns/promises'
 
 setServers(['1.1.1.1', '8.8.8.8'])
 
-dotenv.config({ quiet: true })
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
+dotenv.config({ path: path.resolve(__dirname, '../.env'), quiet: true })
 const MONGO_DB_URL = process.env.MONGO_DB_URL
 
 const connect = async () => {

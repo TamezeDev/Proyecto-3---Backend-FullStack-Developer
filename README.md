@@ -1,6 +1,6 @@
 # Proyecto 3 - Backend
 
-Backend del proyecto fullStack con los endpoints para proporcionar los datos necesarios al fronted
+Backend del proyecto fullStack con los endpoints para proporcionar los datos necesarios al frontend
 
 ## Objetivo
 
@@ -33,6 +33,65 @@ Backend del proyecto fullStack con los endpoints para proporcionar los datos nec
 - Se establece el dns del servicio en *1.1.1.1* (Cloudflare) y *8.8.8.8* (Google) para evitar conflictos de conexión con la base de datos en Mongo Atlas.
 
 ## Instrucciones
+- El proyecto se encuentra actualmente corriendo en producción y se puede acceder a los endpoints.
+
+- Para correr el servidor desde tu equipo:
+1. Descargar el proyecto
+    
+```bash
+  git clone https://github.com/TamezeDev/Proyecto-3---Backend-FullStack-Developer.git
+  cd Proyecto-3---Backend-FullStack-Developer
+```
+2. Instalar las dependencias necesarias
+```bash
+  npm i
+```
+3. Copiar el fichero de variables de entorno `.env` que se envia por email en la raiz del proyecto.
+4. La base de datos se encuentra poblada y funcionando, no obstante, si se quiere probar el script que genera los datos mínimos necesarios para el funcionamiento.
+
+```bash
+  cd seeds
+  node init.seed.js
+```
+- Por consola se le avisará del proceso completado.
+
+5.  Para correr el servidor desde tu equipo:
+
+```bash
+  cd ..
+  npm run start
+```
+- Importante: Tener el puerto 3000 del equipo disponible para levantar el servidor. En caso necesario puede modificar el puerto en el archivo `.env` indicando el puerto que quiera usar.
+
+6. Ya puede acceder a los endpoints !!!
+
+## Semillas de la base de datos
+
+El proyecto incluye un script de semillas que lee varios CSV y los inserta en MongoDB respetando las relaciones entre colecciones para crear un mínimo con el que usar posteriormente en el frontend.
+
+### Origen de los datos
+
+- `books.csv` contiene 60 libros reales (título, autor e ISBN-13 verificados), obtenidos de un dataset
+  público derivado de Goodreads. El campo `content` incluye contenido de relleno tipo Lorem Ipsum
+  (8 "páginas" por libro), ya que el texto real de los libros no es el foco del proyecto.
+- `genres.csv`, `premiumPrices.csv`, `cardPayments.csv` y `users.csv` son datos sintéticos generados
+  para dar coherencia relacional al conjunto (usuarios con biblioteca, lectura activa, tarjeta de pago
+  y, en algunos casos, cuenta premium ya activada).
+- Los usuarios referencian sus libros mediante el campo `isbn` (no un `_id`, que no existe hasta la
+  inserción), y las tarjetas y cuentas premium referencian al usuario mediante su `email`. El script
+  resuelve estas referencias en memoria con `Map` una vez insertada cada colección dependiente.
+
+### Orden de inserción (por dependencias)
+
+1. `genres.csv` → géneros.
+2. `books.csv` → libros, resolviendo el género por nombre.
+3. `premiumPrices.csv` → planes premium.
+4. `cardPayments.csv` → tarjetas de pago.
+5. `users.csv` → usuarios, resolviendo biblioteca y lectura por ISBN, tarjeta por email, y creando
+   además una `PremiumAccount` para los usuarios que ya tienen un plan activo asignado en el CSV.
+
+- Se establece el orden para poder conseguir los ids necesarios para vincular las  colecciones relaccionadas.
+- El script principal se gestiona mediante una transacción. En caso de error se deja la base de datos vacía para evitar conflictos posteriores.
 
 ## Acceso a endpoints
 
