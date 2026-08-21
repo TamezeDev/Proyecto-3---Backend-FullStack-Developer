@@ -50,8 +50,7 @@ Backend del proyecto fullStack con los endpoints para proporcionar los datos nec
 4. La base de datos se encuentra poblada y funcionando, no obstante, si se quiere probar el script que genera los datos mínimos necesarios para el funcionamiento.
 
 ```bash
-  cd seeds
-  node init.seed.js
+  npm run seeds
 ```
 - Por consola se le avisará del proceso completado.
 
@@ -393,12 +392,29 @@ body
 Envío mediante `GET` a:
 
 ```text
-baseUrl/api/v1/books/
+baseUrl/api/v1/books/?page=1&limit=15
 ```
 
 - No requiere token de sesión, cualquier cliente puede consultar el catálogo público.
 - Solo devuelve los libros con `available: true`.
+- Paginado mediante los query params `page` (por defecto `1`) y `limit` (por defecto `15`, máximo `50`).
+- La respuesta **no incluye** el campo `content` (el texto del libro), para que el contenido completo
+  solo sea accesible desde los endpoints de lectura (`/users/reading/...`), protegidos con cuenta premium.
 
+```javascript
+respuesta
+{
+  "message": "Mostrando catálogo de libros",
+  "data": [ /* array de libros, sin content */ ],
+  "pagination": {
+    "page": 1,
+    "limit": 15,
+    "totalBooks": 60,
+    "totalPages": 4,
+    "hasMore": true
+  }
+}
+```
 ### 3. Obtener libros desactivados
 
 Envío mediante `GET` a:

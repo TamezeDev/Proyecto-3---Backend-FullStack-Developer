@@ -131,17 +131,36 @@ export const setAvailableBook = async (req, res, next) => {
   }
 }
 
-// Get all available books for the catalog
-export const getAvailableBooks = async (_req, res, next) => {
+// Get all available books for the catalog (paginated, without full content)
+export const getAvailableBooks = async (req, res, next) => {
   try {
-    const books = await Book.find({ available: true }).populate('genre')
+    const page = Math.max(Number(req.query.page) || 1, 1)
+    const limit = Math.min(Math.max(Number(req.query.limit) || 15, 1), 50)
+    const skip = (page - 1) * limit
+
+    const [books, totalBooks] = await Promise.all([
+      Book.find({ available: true })
+        .select('-content')
+        .populate('genre')
+        .skip(skip)
+        .limit(limit),
+      Book.countDocuments({ available: true }),
+    ])
 
     if (books.length === 0)
       return next(new NotFoundError('El catálogo de libros está vacío'))
 
-    res
-      .status(200)
-      .json({ message: 'Mostrando catálogo de libros', data: books })
+    res.status(200).json({
+      message: 'Mostrando catálogo de libros',
+      data: books,
+      pagination: {
+        page,
+        limit,
+        totalBooks,
+        totalPages: Math.ceil(totalBooks / limit),
+        hasMore: page * limit < totalBooks,
+      },
+    })
   } catch (error) {
     next(new AppError('Error obteniendo el catálogo de libros -> ' + error))
   }
@@ -169,6 +188,8 @@ export const getDisableBooks = async (_req, res, next) => {
     )
   }
 }
+
+// Get info
 
 // Is book available in db
 export const isBookIdOnDb = async (bookID) => {
