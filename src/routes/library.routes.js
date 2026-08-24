@@ -9,7 +9,7 @@ import { isAuth } from '../../shared/middlewares/auth.middleware.js'
 
 const router = Router()
 
-router.get('/library', isAuth(), getUserLibrary)
+router.get('/library', isAuth(), isPremium, getUserLibrary)
 
 router.post('/library/:id', isAuth(), isPremium, addBookToLibrary)
 

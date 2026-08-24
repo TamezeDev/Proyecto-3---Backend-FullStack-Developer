@@ -158,7 +158,10 @@ export const getAllCards = async (req, res, next) => {
     const skip = (page - 1) * limit
 
     const [cards, totalCards] = await Promise.all([
-      CardPayment.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+      CardPayment.find()
+        .sort({ createdAt: -1, _id: 1 })
+        .skip(skip)
+        .limit(limit),
       CardPayment.countDocuments(),
     ])
 

@@ -9,7 +9,7 @@ const premiumPriceSchema = new Schema(
       type: Number,
       required: true,
       min: [1, 'La duración mínima es de 1 mes'],
-      max: [12, 'La duración máxima es de 12 meses'],
+      max: [36, 'La duración máxima es de 36 meses'],
     },
     price: {
       type: Number,

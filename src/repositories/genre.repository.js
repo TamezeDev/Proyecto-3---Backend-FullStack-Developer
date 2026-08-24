@@ -1,12 +1,5 @@
 import { Genre } from '../models/genre.model.js'
-import {
-  ValidationError,
-  InsertError,
-  UpdatingDataError,
-  AppError,
-  NotFoundError,
-} from '../../shared/errors/app.error.js'
-import { isBody } from '../../utils/bodyRequirements.js'
+import { ValidationError, InsertError } from '../../shared/errors/app.error.js'
 
 // Is Genre in Db?
 export const isGenre = async (genreName, session) => {

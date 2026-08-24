@@ -34,28 +34,20 @@ const createPremiumPlan = async (req, res, next) => {
     const body = req.body
 
     if (!isBody(body))
-      return next(
-        new ValidationError('Error: El cuerpo de la petición está vacío')
-      )
+      return next(new ValidationError('El cuerpo de la petición está vacío'))
 
     if (!bodyValidToCreatePremiumPlan(body))
       return next(
-        new ValidationError(
-          'Error: Faltan campos obligatorios para crear el plan'
-        )
+        new ValidationError('Faltan campos obligatorios para crear el plan')
       )
 
     const planExists = await PremiumPrice.findOne({ name: body.name })
     if (planExists)
-      return next(
-        new ValidationError('Error: Ya existe un plan con ese nombre')
-      )
+      return next(new ValidationError('Ya existe un plan con ese nombre'))
 
     const newPlan = await PremiumPrice.create(body)
     if (!newPlan)
-      return next(
-        new InsertError('Error: No se pudo insertar el plan en el servidor')
-      )
+      return next(new InsertError('No se pudo insertar el plan en el servidor'))
 
     res
       .status(201)
@@ -70,7 +62,7 @@ const deletePremiumPlan = async (req, res, next) => {
   try {
     const planId = req.params.id
 
-    if (!planId) return next(new ValidationError('Error: Id de plan requerido'))
+    if (!planId) return next(new ValidationError('Id de plan requerido'))
 
     const deletedPlan = await PremiumPrice.findByIdAndDelete(planId)
     if (!deletedPlan)
@@ -96,14 +88,12 @@ const updatePremiumPlan = async (req, res, next) => {
     if (!planId) return next(new ValidationError('Error: Id de plan requerido'))
 
     if (!isBody(body))
-      return next(
-        new ValidationError('Error: El cuerpo de la petición está vacío')
-      )
+      return next(new ValidationError('El cuerpo de la petición está vacío'))
 
     if (!bodyValidToUpdatePremiumPlan(body))
       return next(
         new ValidationError(
-          'Error: Debes enviar al menos un campo a modificar (nombre, precio o duración)'
+          'Debes enviar al menos un campo a modificar (nombre, precio o duración)'
         )
       )
 

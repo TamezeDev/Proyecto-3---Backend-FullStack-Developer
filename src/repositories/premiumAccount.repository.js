@@ -25,9 +25,7 @@ export const setPremiumAccount = async (req, res, next) => {
     const body = req.body
 
     if (!isBody(body))
-      return next(
-        new ValidationError('Error: El cuerpo de la petición está vacío')
-      )
+      return next(new ValidationError('El cuerpo de la petición está vacío'))
 
     if (!bodyValidToSetPremiumAccount(body))
       return next(

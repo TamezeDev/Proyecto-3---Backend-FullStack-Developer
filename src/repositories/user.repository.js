@@ -120,6 +120,7 @@ const modifyPassword = async (req, res, next) => {
       return next(new ValidationError('La contraseña actual no coincide'))
 
     user.password = body.newPass
+
     const updated = await user.save()
     updated.password = undefined
 
@@ -142,7 +143,7 @@ const getUsers = async (req, res, next) => {
       User.find()
         .select('-password')
         .populate('premiumAccount')
-        .sort({ createdAt: -1 })
+        .sort({ createdAt: -1, _id: 1 })
         .skip(skip)
         .limit(limit),
       User.countDocuments(),

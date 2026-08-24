@@ -73,7 +73,11 @@ export const bodyValidToCreateBook = (body) => {
 }
 
 export const bodyValidToUpdateReadingPage = (body) => {
-  if (!body.currentPage || !body.totalPages || body.currentPage < 1)
+  if (
+    !body.currentPage ||
+    typeof body.currentPage !== 'number' ||
+    body.currentPage < 1
+  )
     return false
   return true
 }

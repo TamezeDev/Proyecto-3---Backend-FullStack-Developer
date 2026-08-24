@@ -3,7 +3,6 @@ import { Book } from '../models/book.model.js'
 import {
   ValidationError,
   InsertError,
-  UpdatingDataError,
   AppError,
   NotFoundError,
 } from '../../shared/errors/app.error.js'
@@ -17,14 +16,12 @@ export const addBook = async (req, res, next) => {
   try {
     const body = req.body
     if (!isBody(body))
-      return next(
-        new ValidationError('Error: El cuerpo de la petición está vacío')
-      )
+      return next(new ValidationError('El cuerpo de la petición está vacío'))
 
     if (!bodyValidToCreateBook(body))
       return next(
         new ValidationError(
-          'Error: Faltan campos obligatorios en el cuerpo de la petición'
+          'Faltan campos obligatorios en el cuerpo de la petición'
         )
       )
 
@@ -37,7 +34,7 @@ export const addBook = async (req, res, next) => {
       const isBook = await isBookUploaded(body.isbn, session)
       if (isBook)
         throw new ValidationError(
-          'Error: El libro que ha enviado ya se encuentra en la base de datos'
+          'El libro que ha enviado ya se encuentra en la base de datos'
         )
 
       const genre = await isGenre(body.genreName, session)
@@ -53,9 +50,7 @@ export const addBook = async (req, res, next) => {
       const [createdBook] = await Book.create([body], { session })
       book = createdBook
       if (!book)
-        throw new InsertError(
-          'Error: No se pudo insertar el libro en el servidor'
-        )
+        throw new InsertError('No se pudo insertar el libro en el servidor')
     })
     res
       .status(201)
@@ -82,8 +77,7 @@ export const setNoAvailableBook = async (req, res, next) => {
   try {
     const bookId = req.params.id
 
-    if (!bookId)
-      return next(new ValidationError('Error: Id de libro requerido'))
+    if (!bookId) return next(new ValidationError('Id de libro requerido'))
 
     const deletedBook = await Book.findByIdAndUpdate(
       bookId,
@@ -109,8 +103,7 @@ export const setAvailableBook = async (req, res, next) => {
   try {
     const bookId = req.params.id
 
-    if (!bookId)
-      return next(new ValidationError('Error: Id de libro requerido'))
+    if (!bookId) return next(new ValidationError('Id de libro requerido'))
 
     const activeBook = await Book.findByIdAndUpdate(
       bookId,
@@ -142,6 +135,7 @@ export const getAvailableBooks = async (req, res, next) => {
       Book.find({ available: true })
         .select('-content')
         .populate('genre')
+        .sort({ createdAt: -1, _id: 1 })
         .skip(skip)
         .limit(limit),
       Book.countDocuments({ available: true }),

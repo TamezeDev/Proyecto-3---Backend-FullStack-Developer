@@ -13,8 +13,7 @@ const addBookToLibrary = async (req, res, next) => {
     const userId = req.body.userId
     const bookId = req.params.id
 
-    if (!bookId)
-      return next(new ValidationError('Error: Id de libro requerido'))
+    if (!bookId) return next(new ValidationError('Id de libro requerido'))
 
     const bookFound = await isBookIdOnDb(bookId)
     if (!bookFound)
@@ -48,7 +47,7 @@ const addBookToLibrary = async (req, res, next) => {
 
     res.status(200).json({
       message: 'Libro añadido a tu biblioteca con éxito',
-      data: userUpdated,
+      data: userUpdated.library,
     })
   } catch (error) {
     next(new AppError('Error añadiendo libro a la biblioteca -> ' + error))
@@ -61,8 +60,7 @@ const removeBookFromLibrary = async (req, res, next) => {
     const userId = req.body.userId
     const bookId = req.params.id
 
-    if (!bookId)
-      return next(new ValidationError('Error: Id de libro requerido'))
+    if (!bookId) return next(new ValidationError('Id de libro requerido'))
 
     const user = await User.findById(userId)
     if (!user)
@@ -96,7 +94,7 @@ const removeBookFromLibrary = async (req, res, next) => {
 
     res.status(200).json({
       message: 'Libro eliminado de tu biblioteca con éxito',
-      data: userUpdated,
+      data: userUpdated.library,
     })
   } catch (error) {
     next(new AppError('Error eliminando libro de la biblioteca -> ' + error))

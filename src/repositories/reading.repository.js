@@ -5,7 +5,10 @@ import {
   AppError,
   NotFoundError,
 } from '../../shared/errors/app.error.js'
-import { isBody, bodyValidToUpdateReadingPage } from '../../utils/bodyRequirements.js'
+import {
+  isBody,
+  bodyValidToUpdateReadingPage,
+} from '../../utils/bodyRequirements.js'
 import { getBookById } from './book.repository.js'
 
 // Start reading a book (requires premium, and the book already in library)
@@ -14,8 +17,7 @@ const addBookToReading = async (req, res, next) => {
     const userId = req.body.userId
     const bookId = req.params.id
 
-    if (!bookId)
-      return next(new ValidationError('Error: Id de libro requerido'))
+    if (!bookId) return next(new ValidationError('Id de libro requerido'))
 
     const user = await User.findById(userId)
     if (!user)
@@ -59,7 +61,7 @@ const addBookToReading = async (req, res, next) => {
 
     res.status(200).json({
       message: 'Libro añadido a tu lectura actual con éxito',
-      data: userUpdated,
+      data: userUpdated.reading,
     })
   } catch (error) {
     next(new AppError('Error añadiendo libro a lectura actual -> ' + error))
@@ -140,8 +142,7 @@ const getReadingProgress = async (req, res, next) => {
     const userId = req.body.userId
     const bookId = req.params.id
 
-    if (!bookId)
-      return next(new ValidationError('Error: Id de libro requerido'))
+    if (!bookId) return next(new ValidationError('Id de libro requerido'))
 
     const user = await User.findById(userId).populate({
       path: 'reading',
@@ -182,13 +183,10 @@ const setReadingPage = async (req, res, next) => {
     const bookId = req.params.id
     const body = req.body
 
-    if (!bookId)
-      return next(new ValidationError('Error: Id de libro requerido'))
+    if (!bookId) return next(new ValidationError('Id de libro requerido'))
 
     if (!isBody(body))
-      return next(
-        new ValidationError('Error: El cuerpo de la petición está vacío')
-      )
+      return next(new ValidationError('El cuerpo de la petición está vacío'))
 
     if (!bodyValidToUpdateReadingPage(body))
       return next(
