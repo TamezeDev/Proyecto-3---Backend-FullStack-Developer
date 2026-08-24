@@ -24,14 +24,12 @@ export const newCard = async (req, res, next) => {
     const body = req.body
 
     if (!isBody(body))
-      return next(
-        new ValidationError('Error: El cuerpo de la petición está vacío')
-      )
+      return next(new ValidationError('El cuerpo de la petición está vacío'))
 
     if (!bodyValidToRegisterCard(body))
       return next(
         new ValidationError(
-          'Error: Faltan campos obligatorios en el registro de la tarjeta'
+          'Faltan campos obligatorios en el registro de la tarjeta'
         )
       )
 
@@ -40,7 +38,7 @@ export const newCard = async (req, res, next) => {
 
     if (!card)
       return next(
-        new InsertError('Error: No se pudo insertar la tarjeta en el servidor')
+        new InsertError('No se pudo insertar la tarjeta en el servidor')
       )
     await addUserCard(body.userId, card._id)
 
@@ -93,14 +91,12 @@ export const addCreditToCard = async (req, res, next) => {
     const body = req.body
 
     if (!isBody(body))
-      return next(
-        new ValidationError('Error: El cuerpo de la petición está vacío')
-      )
+      return next(new ValidationError('El cuerpo de la petición está vacío'))
 
     if (!bodyValidToAddCreditCard(body))
       return next(
         new ValidationError(
-          'Error: Formato incorrecto de los datos necesarios para realizar esta operación'
+          'Formato incorrecto de los datos necesarios para realizar esta operación'
         )
       )
 
@@ -151,6 +147,38 @@ export const doPremiumPayment = async (userId, cardId, quanty, session) => {
     { $inc: { credit: -quanty } },
     { returnDocument: 'after', runValidators: true, session }
   )
-  if (!cardPayment)
-    throw new NotFoundError('Error: No se pudo efectuar el pago')
+  if (!cardPayment) throw new NotFoundError('No se pudo efectuar el pago')
+}
+
+// Get all cards (only by admins)
+export const getAllCards = async (req, res, next) => {
+  try {
+    const page = Math.max(parseInt(req.query.page) || 1, 1)
+    const limit = Math.min(Math.max(parseInt(req.query.limit) || 12, 1), 50)
+    const skip = (page - 1) * limit
+
+    const [cards, totalCards] = await Promise.all([
+      CardPayment.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+      CardPayment.countDocuments(),
+    ])
+
+    if (cards.length === 0)
+      return next(new NotFoundError('No se encontraron tarjetas registradas'))
+
+    const totalPages = Math.ceil(totalCards / limit)
+
+    res.status(200).json({
+      message: 'Mostrando lista de tarjetas',
+      data: cards,
+      pagination: {
+        page,
+        limit,
+        totalCards,
+        totalPages,
+        hasMore: page < totalPages,
+      },
+    })
+  } catch (error) {
+    next(new AppError('Error obteniendo el listado de tarjetas -> ' + error))
+  }
 }

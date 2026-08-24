@@ -262,6 +262,34 @@ body
 - Para ingresar saldo, la tarjeta debe estar asociada a la lista de un usuario
 - Se comprueba el tipo de dato enviado para transformar a Number y sumar al crédito actual
 
+### 4. Obtener todas las tarjetas registradas
+
+Envío mediante `GET` a:
+
+```text
+baseUrl/api/v1/cards/?page=1&limit=12
+```
+
+- Se requiere de headers con el token de sesión para identificar el usuario en la base de datos.
+- Esta operación solo se puede realizar por administradores.
+- Paginado mediante los query params `page` (por defecto `1`) y `limit` (por defecto `12`, máximo `50`).
+- Ordenado por fecha de creación descendente (las tarjetas más recientes primero).
+
+```javascript
+respuesta
+{
+  "message": "Mostrando lista de tarjetas",
+  "data": [ /* array de tarjetas */ ],
+  "pagination": {
+    "page": 1,
+    "limit": 12,
+    "totalCards": 25,
+    "totalPages": 3,
+    "hasMore": true
+  }
+}
+```
+
 ## Cuenta premium
 
 ### 1. Activar o renovar cuenta premium de usuario

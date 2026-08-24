@@ -11,10 +11,10 @@ export const isAuth = (...allowedRoles) => {
   return async (req, _res, next) => {
     try {
       const jwt = req.headers.authorization?.split(' ')[1]
-      if (!jwt)
-        return next(new ValidationError('Error: Token de sesión requerido'))
+      if (!jwt) return next(new ValidationError('Token de sesión requerido'))
 
       const userId = verifyToken(jwt).id
+      req.body = req.body || {}
       req.body.userId = userId
       const userDb = await User.findById(userId)
       if (!userDb) return next(new ForbiddenError())

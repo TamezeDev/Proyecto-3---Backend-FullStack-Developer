@@ -22,26 +22,24 @@ const createUser = async (req, res, next) => {
     const body = req.body
 
     if (!isBody(body))
-      return next(
-        new ValidationError('Error: El cuerpo de la petición está vacío')
-      )
+      return next(new ValidationError('El cuerpo de la petición está vacío'))
 
     if (!bodyValidToRegisterUser(body))
       return next(
         new ValidationError(
-          'Error: Faltan campos obligatorios en el registro de usuario'
+          'Faltan campos obligatorios en el registro de usuario'
         )
       )
 
     const emailOnUse = await User.findOne({ email: body.email })
 
     if (emailOnUse)
-      return next(new ValidationError('Error: El email ya está registrado'))
+      return next(new ValidationError('El email ya está registrado'))
 
     const newUser = await User.create(body)
     if (!newUser)
       return next(
-        new InsertError('Error: No se pudo insertar el usuario en el servidor')
+        new InsertError('No se pudo insertar el usuario en el servidor')
       )
 
     res
@@ -58,20 +56,17 @@ const login = async (req, res, next) => {
     const body = req.body
 
     if (!isBody(body))
-      return next(
-        new ValidationError('Error: El cuerpo de la petición está vacío')
-      )
+      return next(new ValidationError('El cuerpo de la petición está vacío'))
 
     if (!bodyValidToLogin(body))
       return next(
-        new ValidationError(
-          'Error: Faltan campos obligatorios en el login de usuario'
-        )
+        new ValidationError('Faltan campos obligatorios en el login de usuario')
       )
 
-    const userFound = await User.findOne({ email: body.email }).select(
-      '+password'
-    )
+    const userFound = await User.findOne({ email: body.email })
+      .select('+password')
+      .populate('cardPayments')
+      .populate('premiumAccount')
     let matchPass
 
     if (userFound) {
@@ -82,13 +77,17 @@ const login = async (req, res, next) => {
 
     if (!userFound || !matchPass)
       return next(
-        new ValidationError('Error: Email de usuario o contraseña incorrectos')
+        new ValidationError('Email de usuario o contraseña incorrectos')
       )
+    const userObject = userFound.toObject()
+    delete userObject.password
 
     const sessionToken = generateToken(userFound._id)
-    return res
-      .status(200)
-      .json({ message: 'Login realizado con éxito', sessionToken })
+    return res.status(200).json({
+      message: 'Login realizado con éxito',
+      sessionToken,
+      user: userObject,
+    })
   } catch (error) {
     next(new AppError('Error inesperado en el login de usuario -> ' + error))
   }
@@ -100,14 +99,12 @@ const modifyPassword = async (req, res, next) => {
     const body = req.body
 
     if (!isBody(body))
-      return next(
-        new ValidationError('Error: El cuerpo de la petición está vacío')
-      )
+      return next(new ValidationError('El cuerpo de la petición está vacío'))
 
     if (!bodyValidToChangePass(body))
       return next(
         new ValidationError(
-          'Error: Faltan campos obligatorios para el cambio de contraseña'
+          'Faltan campos obligatorios para el cambio de contraseña'
         )
       )
 
@@ -120,9 +117,7 @@ const modifyPassword = async (req, res, next) => {
       user.password
     )
     if (!matchCurrentPass)
-      return next(
-        new ValidationError('Error: La contraseña actual no coincide')
-      )
+      return next(new ValidationError('La contraseña actual no coincide'))
 
     user.password = body.newPass
     const updated = await user.save()
@@ -136,28 +131,41 @@ const modifyPassword = async (req, res, next) => {
   }
 }
 
-// Get all user
-const getUsers = async (_req, res, next) => {
+// Get all user (Paginado)
+const getUsers = async (req, res, next) => {
   try {
-    const users = await User.find()
-      .populate({
-        path: 'reading',
-        populate: [{ path: 'book', model: 'Book' }],
-      })
-      .populate({
-        path: 'library',
-        populate: [{ path: 'book', model: 'Book' }],
-      })
-      .populate('premiumAccount')
-      .populate('cardPayments')
+    const page = Math.max(parseInt(req.query.page) || 1, 1)
+    const limit = Math.min(Math.max(parseInt(req.query.limit) || 12, 1), 50)
+    const skip = (page - 1) * limit
+
+    const [users, totalUsers] = await Promise.all([
+      User.find()
+        .select('-password')
+        .populate('premiumAccount')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      User.countDocuments(),
+    ])
 
     if (users.length === 0)
-      return next(new NotFoundError('La lista de usuarios está vacía'))
-    res
-      .status(200)
-      .json({ message: 'Mostrando lista de usuarios', data: users })
+      return next(new NotFoundError('No se encontraron usuarios'))
+
+    const totalPages = Math.ceil(totalUsers / limit)
+
+    res.status(200).json({
+      message: 'Mostrando lista de usuarios',
+      data: users,
+      pagination: {
+        page,
+        limit,
+        totalUsers,
+        totalPages,
+        hasMore: page < totalPages,
+      },
+    })
   } catch (error) {
-    next(new AppError('Error obteniendo datos de los usuarios -> ' + error))
+    next(new AppError('Error obteniendo los usuarios -> ' + error))
   }
 }
 
@@ -282,7 +290,7 @@ const userHasCard = async (userId, cardId, session) => {
 
 // Get userPremium account ID
 const getUserPremiumAccountId = async (userId, session) => {
-  if (!userId) throw new ValidationError('Error: Id de usuario requerido')
+  if (!userId) throw new ValidationError('Id de usuario requerido')
 
   const user = await User.findById(userId).session(session)
   if (!user) {
@@ -295,9 +303,7 @@ const getUserPremiumAccountId = async (userId, session) => {
 // Set a first time premium account id
 const setUserPremiumAccount = async (userId, premiumAccountId, session) => {
   if (!userId || !premiumAccountId)
-    throw new ValidationError(
-      'Error: Se requiren ids de usuario y de cuenta premium'
-    )
+    throw new ValidationError('Se requiren ids de usuario y de cuenta premium')
   const userUpdated = await User.findByIdAndUpdate(
     userId,
     { premiumAccount: premiumAccountId },

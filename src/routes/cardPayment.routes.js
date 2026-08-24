@@ -3,10 +3,13 @@ import {
   newCard,
   deleteCardPayment,
   addCreditToCard,
+  getAllCards,
 } from '../repositories/cardPayment.repository.js'
 import { isAuth } from '../../shared/middlewares/auth.middleware.js'
 
 const router = Router()
+
+router.get('/', isAuth('admin'), getAllCards)
 
 router.post('/create', isAuth(), newCard)
 router.post('/addCredit/:id', isAuth(), addCreditToCard)

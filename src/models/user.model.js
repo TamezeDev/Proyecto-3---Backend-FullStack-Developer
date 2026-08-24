@@ -22,7 +22,7 @@ const userSchema = new Schema(
       trim: true,
       required: true,
       match: [
-        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?_#&-]+$/,
+        /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).+$/,
         'La contraseña debe contener mayusculas, minusculas y algún caracter especial',
       ],
       minlength: [8, 'La contraseña debe tener al menos 8 caracteres'],

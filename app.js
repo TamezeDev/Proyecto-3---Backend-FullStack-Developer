@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 import {
   unexpectedError,
   notFoundError,
@@ -19,6 +20,7 @@ const app = express()
 const initBackend = async () => {
   // Conecction
   await connect()
+  app.use(cors())
   app.use(express.json())
   // Endpoints
   app.use(`${BASE_URL}/users`, userRoutes)
