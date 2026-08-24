@@ -1,5 +1,5 @@
 import './src/models/index.js'
-import { initBackend, app } from './app.js'
+import app from './app.js'
 import dotenv from 'dotenv'
 
 dotenv.config({ quiet: true })
@@ -11,5 +11,4 @@ const initListener = () =>
     console.log(`✅ Servidor iniciado en: http://localhost:${PORT}`)
   })
 
-initBackend()
 initListener()

@@ -17,24 +17,22 @@ import bookRoutes from './src/routes/book.routes.js'
 const BASE_URL = '/api/v1'
 const app = express()
 
-const initBackend = async () => {
-  // Conecction
-  await connect()
-  app.use(cors())
-  app.use(express.json())
-  // Endpoints
-  app.use(`${BASE_URL}/users`, userRoutes)
-  app.use(`${BASE_URL}/users`, libraryRoutes)
-  app.use(`${BASE_URL}/users`, readingRoutes)
-  app.use(`${BASE_URL}/cards`, cardPaymentRoutes)
-  app.use(`${BASE_URL}/premium`, premiumAccountRoutes)
-  app.use(`${BASE_URL}/plans`, premiumPricesRoutes)
-  app.use(`${BASE_URL}/books`, bookRoutes)
-  // Middlewares
-  app.use(notFoundError)
-  app.use(unexpectedError)
-  // Tasks
-  startPremiumExpirationTask()
-}
+// Conecction
+await connect()
+app.use(cors())
+app.use(express.json())
+// Endpoints
+app.use(`${BASE_URL}/users`, userRoutes)
+app.use(`${BASE_URL}/users`, libraryRoutes)
+app.use(`${BASE_URL}/users`, readingRoutes)
+app.use(`${BASE_URL}/cards`, cardPaymentRoutes)
+app.use(`${BASE_URL}/premium`, premiumAccountRoutes)
+app.use(`${BASE_URL}/plans`, premiumPricesRoutes)
+app.use(`${BASE_URL}/books`, bookRoutes)
+// Middlewares
+app.use(notFoundError)
+app.use(unexpectedError)
+// Tasks
+startPremiumExpirationTask()
 
-export { initBackend, app }
+export default app
