@@ -13,10 +13,25 @@ export const isAuth = (...allowedRoles) => {
       const jwt = req.headers.authorization?.split(' ')[1]
       if (!jwt) return next(new ValidationError('Token de sesión requerido'))
 
-      const userId = verifyToken(jwt).id
+      let decoded
+
+      try {
+        decoded = verifyToken(jwt)
+      } catch (jwtError) {
+        if (jwtError.name === 'TokenExpiredError') {
+          return next(
+            new AuthError(
+              'Tu sesión ha caducado, cierra tu sesión actual y haz login de nuevo'
+            )
+          )
+        }
+        return next(new AuthError('Token de sesión inválido'))
+      }
+
       req.body = req.body || {}
-      req.body.userId = userId
-      const userDb = await User.findById(userId)
+      req.body.userId = decoded.id
+
+      const userDb = await User.findById(decoded.id)
       if (!userDb) return next(new ForbiddenError())
       if (allowedRoles.length > 0 && !allowedRoles.includes(userDb.role))
         return next(new AuthError())
